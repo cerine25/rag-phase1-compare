@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 # SigLIP release provenance from artifacts/manifest.json (env.python): Python 3.13.7 / torch 2.15.0+cpu / transformers 5.22.1.
 # Python 3.13.7 is the verified runtime for the frozen g1-v1.1 release.
 # v1.0 CLIP and DINOv2 provenance from artifacts/manifest_v1.0_backup.json:
