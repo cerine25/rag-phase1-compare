@@ -38,13 +38,38 @@ notebooks in place.
 Test without network access or a GPU (synthetic mini-COCO + fake encoder):
 ```bash
 python tools/make_fake_coco.py
-python tools/run_notebooks.py --config config_test.yaml --skip 00_download
+python tools/run_notebooks.py --config config_test.yaml --skip 00_download_annotations 01b_download_images
 ```
 In Jupyter/Colab: set `CONFIG = "config_test.yaml"` in the 1st cell (or set
 the `RAG_CONFIG` environment variable).
 The delivered notebooks contain the **outputs from the most recent run**;
 shared helpers are in `common.py`, `visual.py`, and `rag_data.py` (keep them in
 the same folder).
+
+## Artifact availability
+
+The Git repository contains the split definitions, metadata and caption
+tables, audit/QC records, selected figures, and `artifacts/manifest.json`.
+The manifest also lists 10,200 normalized images, 26 embedding files, and 8
+FAISS indexes; these large binary files are **not tracked in Git**
+(see `.gitignore`). A clean clone therefore cannot run the `rag_data.Release`
+retrieval examples until those files are obtained or regenerated from the
+documented source data and the pinned environment. The repository does not
+include the raw COCO datasets or model weights.
+
+> **Download link for the binary artifacts:** _TO BE ADDED before submission_
+> (GitHub Release, Drive, or Hugging Face). After downloading, extract the
+> archive so that the `artifacts/` folder sits next to `config.yaml`, then run
+> `python tools/run_freeze_only.py --verify` to check the SHA-256 hashes
+> against `artifacts/manifest.json`.
+
+## Attribution and third-party materials
+
+This project uses the MS COCO 2017 dataset and the pretrained models listed in
+`config.yaml`. Review the dataset's and each model's applicable terms and
+provide the required attribution before redistributing data or weights. The
+repository does not grant rights to third-party datasets or model weights, and
+it does not currently include a license file for the project code.
 
 | notebook | purpose |
 |---|---|
@@ -166,9 +191,14 @@ the specification: `index/index_report.json`.
 - Spatial relations are based on bounding-box geometry (not a true scene
   graph); text attributes use a color/size/material/state lexicon.
 - Historical runtime versions differ: `artifacts/manifest.json` records
-  Python 3.13.7 for g1-v1.1; the v1.0 manifest records Python 3.11.9.
-  SigLIP's Python 3.13.7 provenance is sourced from `env.python` in the
-  current manifest.
+  Python 3.13.7 for g1-v1.1 and the v1.0 manifest records Python 3.11.9, while
+  `SIGLIP_ENV_NOTE.txt` records Python 3.13.3 for the SigLIP run. The exact
+  runtime of that run has not been reconciled.
+- `artifacts/splits/splits_meta.json` (Python 3.14.2) and
+  `artifacts/eda/EDA_REPORT.md` still carry the label `g1-v1.0`: they were
+  generated during the v1.0 build and are part of the frozen manifest, so they
+  were left untouched. The release identity is `g1-v1.1`, as recorded in
+  `artifacts/manifest.json` and `config.yaml`.
 - After `08_freeze`, files in `artifacts/` are read-only. Do not unlock them to
   modify this release; prepare a new copy/version instead.
 
