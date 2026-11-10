@@ -1,4 +1,4 @@
-"""Fonctions pixel partagées (hash perceptuel, couleurs nommées)."""
+"""Shared pixel functions (perceptual hash, named colors)."""
 import numpy as np
 from collections import Counter
 from PIL import Image
@@ -12,7 +12,7 @@ def dhash(img: Image.Image, size: int = 8) -> str:
 
 
 def named_colors(rgb_small: np.ndarray) -> dict:
-    """Répartition des pixels dans 11 couleurs nommées (règles HSV) -> attributs visuels sans modèle."""
+    """Distribution of pixels over 11 named colors (HSV rules) -> visual attributes without a model."""
     x = rgb_small.reshape(-1, 3) / 255.0
     mx, mn = x.max(1), x.min(1)
     v, d = mx, mx - mn

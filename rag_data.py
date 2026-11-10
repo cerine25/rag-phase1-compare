@@ -1,13 +1,13 @@
-"""API de lecture de la release figée — c'est ce que les autres groupes importent.
+"""Read API for the frozen release — this is what the other groups import.
 
     from rag_data import Release
     R = Release("artifacts")
-    Q = R.image_embeddings("test")                    # (100, d) float32 normalisé, lignes alignées sur R.ids("test")
-    scores, kb_img_ids = R.search_images(Q, k=5, query_ids=R.ids("test"))   # garde-fou anti-fuite intégré
-    caps = R.kb_captions_of(kb_img_ids[0, 0])         # captions (brutes) de l'image retrouvée
-    refs = R.eval_refs("test")                        # {image_id: [5 captions]} -> UNIQUEMENT pour l'évaluation
+    Q = R.image_embeddings("test")                    # (100, d) float32, L2-normalized, rows aligned with R.ids("test")
+    scores, kb_img_ids = R.search_images(Q, k=5, query_ids=R.ids("test"))   # built-in anti-leakage guard
+    caps = R.kb_captions_of(kb_img_ids[0, 0])         # (raw) captions of the retrieved image
+    refs = R.eval_refs("test")                        # {image_id: [5 captions]} -> for evaluation ONLY
 
-Le retriever n'a accès qu'à la KB : les références val/test sont dans des fichiers séparés.
+The retriever only has access to the KB: val/test references live in separate files.
 """
 from __future__ import annotations
 import json
@@ -85,23 +85,23 @@ class Release:
         return self._faiss[kind]
 
     def search_images(self, Q: np.ndarray, k=5, query_ids=None, kind="flatip"):
-        """Top-k images de la KB (cosinus). `query_ids` : IDs des images requêtes -> toute collision est refusée."""
+        """Top-k KB images (cosine). `query_ids`: IDs of the query images -> any self-match is rejected."""
         S, I = self._index(kind).search(np.ascontiguousarray(Q, dtype=np.float32), k)
         kb_ids = np.load(self.emb / "ids_kb.npy")
         out = kb_ids[I]
         if query_ids is not None:
             qi = np.asarray(query_ids)[:, None]
-            assert not (out == qi).any(), "FUITE : une image requête a été retrouvée elle-même"
+            assert not (out == qi).any(), "LEAKAGE: a query image retrieved itself"
         return S, out
 
     def search_texts(self, Q: np.ndarray, k=5):
-        """Image->texte : Q = embeddings image (même espace que la tour texte, CLIP/SigLIP). Renvoie (scores, caption_ids, image_ids)."""
+        """Image->text: Q = image embeddings (same space as the text tower, CLIP/SigLIP). Returns (scores, caption_ids, image_ids)."""
         T, cids, iids = self.kb_text_embeddings()
         S, I = self._index("txt_flatip").search(np.ascontiguousarray(Q, dtype=np.float32), k)
         return S, cids[I], iids[I]
 
     def verify(self):
-        """Compare les SHA-256 des fichiers à artifacts/manifest.json (garantit que tous les groupes ont la même release)."""
+        """Compares file SHA-256 hashes against artifacts/manifest.json (guarantees all groups have the same release)."""
         from common import sha256_file
         man = json.load(open(self.root / "manifest.json")); bad = []
         for rel, info in man["files"].items():

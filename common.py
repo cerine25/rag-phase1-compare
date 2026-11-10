@@ -1,4 +1,4 @@
-"""Utilitaires partagés : config, chemins, I/O JSONL, hash, logging, seeds."""
+"""Shared utilities: config, paths, JSONL I/O, hashing, logging, seeds."""
 from __future__ import annotations
 import hashlib, json, logging, os, platform, random, re, sys, time
 from pathlib import Path
@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent
 
 
 def load_config(path: str | Path | None = None) -> dict:
-    # RAG_CONFIG=config_test.yaml permet de lancer tout le pipeline sur le mini-COCO synthétique
+    # RAG_CONFIG=config_test.yaml lets you run the whole pipeline on the synthetic mini-COCO
     path = path or os.environ.get("RAG_CONFIG") or ROOT / "config.yaml"
     with open(ROOT / path if not Path(path).is_absolute() else path, encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -120,7 +120,7 @@ def env_info() -> dict:
     return info
 
 
-# ---- nettoyage de légendes (UNIQUEMENT pour l'indexation/retrieval ; les références d'évaluation restent brutes)
+# ---- caption cleaning (ONLY for indexing/retrieval; evaluation references stay raw)
 _WS = re.compile(r"\s+")
 _PUNCT = re.compile(r"[^\w\s']")
 
@@ -136,7 +136,7 @@ def tokenize(text: str) -> list[str]:
     return clean_caption(text).split()
 
 
-# ---- taxonomie de contexte (supercatégories COCO)
+# ---- context taxonomy (COCO supercategories)
 INDOOR_SUPERCATS = {"furniture", "appliance", "kitchen", "electronic", "indoor"}
 OUTDOOR_SUPERCATS = {"vehicle", "outdoor", "animal"}
 INTERACTION_SUPERCATS_NON_PERSON = {"animal", "sports", "vehicle", "kitchen", "food", "furniture", "accessory", "indoor",

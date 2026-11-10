@@ -6,9 +6,9 @@ pillow>=10.0
 matplotlib>=3.8
 faiss-cpu>=1.8          # ou faiss-gpu
 tqdm
-pycocoevalcap>=1.2      # CIDEr (scorer pur Python, pas besoin de Java pour CIDEr seul)
+pycocoevalcap>=1.2      # CIDEr (pure-Python scorer, no Java needed for CIDEr alone)
 nltk>=3.8               # POS tagging (EDA) ; alternative : spacy + en_core_web_sm
-# --- encodeurs (GPU recommandé) ---
+# --- encoders (GPU recommended) ---
 torch>=2.2
 transformers>=4.40
 sentence-transformers>=2.7

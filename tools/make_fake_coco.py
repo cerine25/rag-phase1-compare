@@ -1,4 +1,4 @@
-"""Génère un mini-COCO SYNTHÉTIQUE (même format que COCO 2017) pour tester le pipeline hors-ligne.
+"""Generates a SYNTHETIC mini-COCO (same format as COCO 2017) to test the pipeline offline.
 Usage: python tools/make_fake_coco.py --out data_fake/raw --n-train 1500 --n-val 400
 """
 import argparse, json, random
@@ -49,11 +49,11 @@ def gen(split, n, start_id, out: Path, rng):
         if k == 3:                      # une image niveaux de gris (test conversion RGB)
             im = img.convert("L")
         im.save(out / "images" / split / fn, quality=90)
-        if k == 5:                      # une image avec EXIF orientation=6 (test correction)
+        if k == 5:                      # one image with EXIF orientation=6 (tests the correction)
             ex = Image.Exif(); ex[0x0112] = 6
             img.save(out / "images" / split / fn, quality=90, exif=ex)
         images.append({"id": iid, "file_name": fn, "width": w, "height": h, "coco_url": f"http://fake/{split}/{fn}"})
-        for j in range(5 if k % 97 else 6):  # une image à 6 captions
+        for j in range(5 if k % 97 else 6):  # one image with 6 captions
             col, nm = rng.choice(words)
             where = SCENES[rng.choice(["indoor", "outdoor", "mixed"])]
             tmpl = rng.choice([f"A {col} {nm} {where}.", f"There is a {col} {nm} and {len(words)} objects.",

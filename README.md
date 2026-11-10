@@ -62,6 +62,10 @@ include the raw COCO datasets or model weights.
 > archive so that the `artifacts/` folder sits next to `config.yaml`, then run
 > `python tools/run_freeze_only.py --verify` to check the SHA-256 hashes
 > against `artifacts/manifest.json`.
+> The repository's `.gitattributes` forces CRLF line endings on the text files
+> under `artifacts/`, because the manifest hashes were computed on Windows with
+> CRLF. Keep it in place, otherwise text-file hashes will not match on
+> Linux/macOS.
 
 ## Attribution and third-party materials
 
@@ -201,6 +205,12 @@ the specification: `index/index_report.json`.
   `artifacts/manifest.json` and `config.yaml`.
 - After `08_freeze`, files in `artifacts/` are read-only. Do not unlock them to
   modify this release; prepare a new copy/version instead.
+- `artifacts/audit/preproc_config_selection.json` contains an automatically
+  generated `warning` text advising to keep CLIP ViT-B/32 when the difference to
+  the runner-up is not significant. The selected configuration is
+  `siglip-b16|img2txt`, following the file's own `recommendation_rule` (keep the
+  primary encoder unless it is significantly worse). The file is frozen, so the
+  warning text was left untouched; the SigLIP choice is the authoritative one.
 
 ## Reports and documentation
 

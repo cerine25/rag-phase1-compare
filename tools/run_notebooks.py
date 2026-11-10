@@ -1,7 +1,7 @@
-"""Exécute les notebooks dans l'ordre (sans interface) et sauvegarde les versions exécutées.
-  python tools/run_notebooks.py                       # vraies données (config.yaml), tous les notebooks 00..09
-  python tools/run_notebooks.py --config config_test.yaml --skip 00_download_annotations 01b_download_images   # test synthétique sans réseau
-Les notebooks d'origine restent propres (sans sorties) ; les copies exécutées vont dans executed_notebooks/.
+"""Runs the notebooks in order (headless) and saves the executed versions.
+  python tools/run_notebooks.py                       # real data (config.yaml), all notebooks 00..09
+  python tools/run_notebooks.py --config config_test.yaml --skip 00_download_annotations 01b_download_images   # synthetic test without network
+The original notebooks stay clean (no outputs); executed copies go to executed_notebooks/.
 """
 import argparse, os, shutil, stat, sys, time
 from pathlib import Path
@@ -11,7 +11,7 @@ from nbclient.exceptions import CellExecutionError
 
 ROOT = Path(__file__).resolve().parent.parent
 ORDER = ["00_download_annotations", "01_make_splits", "01b_download_images", "02_preprocess_images", "03_captions_metadata", "04_embeddings_index", "05_eda",
-         "06_select_config", "07_qc_leakage", "08_freeze", "09_demo_retrieval"]   # 03b_detect_objects : optionnel, à lancer à la main
+         "06_select_config", "07_qc_leakage", "08_freeze", "09_demo_retrieval"]   # 03b_detect_objects: optional, run it by hand
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--config", default="config.yaml"); ap.add_argument("--skip", nargs="*", default=[])
@@ -19,7 +19,7 @@ ap.add_argument("--only", nargs="*"); ap.add_argument("--out", default="executed
 a = ap.parse_args()
 os.environ["RAG_CONFIG"] = a.config
 out = ROOT / a.out; out.mkdir(exist_ok=True)
-for art in ROOT.glob("artifacts*"):                       # déverrouille une release déjà figée avant de relancer
+for art in ROOT.glob("artifacts*"):                       # unlock an already frozen release before rerunning
     for f in art.rglob("*"):
         if f.is_file():
             f.chmod(f.stat().st_mode | stat.S_IWUSR)

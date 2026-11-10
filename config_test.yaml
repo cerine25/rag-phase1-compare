@@ -1,4 +1,4 @@
-# Config de TEST (mini-COCO synthétique, encodeur factice) — ne pas utiliser pour la vraie release
+# TEST config (synthetic mini-COCO, fake encoder) — do not use for the real release
 seed: 42
 release_version: "g1-TEST"
 paths: {raw: data_fake/raw, artifacts: artifacts_test}

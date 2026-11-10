@@ -1,0 +1,9 @@
+# The frozen manifest (artifacts/manifest.json) stores SHA-256 hashes that were
+# computed on Windows with CRLF line endings. Force the same line endings on
+# checkout so `python tools/run_freeze_only.py --verify` passes on every OS.
+artifacts/**/*.json  text eol=crlf
+artifacts/**/*.jsonl text eol=crlf
+artifacts/**/*.csv   text eol=crlf
+artifacts/**/*.md    text eol=crlf
+artifacts/**/*.txt   text eol=crlf
+artifacts/**/*.png   binary

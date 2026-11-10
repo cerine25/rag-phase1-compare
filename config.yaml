@@ -1,35 +1,35 @@
-# Configuration unique du pipeline G1 (tout est piloté d'ici, rien en dur dans les scripts)
+# Single configuration of the G1 pipeline (everything is driven from here, nothing hard-coded in the scripts)
 seed: 42
 release_version: "g1-v1.1"
 
 paths:
   raw: data/raw                 # annotations + images COCO brutes
-  artifacts: artifacts          # tout ce qui est produit (= la "release" figée)
+  artifacts: artifacts          # everything that is produced (= the frozen "release")
 
-sizes:                          # tailles des splits (cf. énoncé §4.2)
+sizes:                          # split sizes (see specification §4.2)
   kb: 10000                     # COCO train2017, base de connaissances RAG
   val: 100                      # COCO train2017 (disjoint de la KB), tuning
-  test: 100                     # COCO val2017, évaluation finale  (100 images, conformément au sujet §4.1/4.2)
+  test: 100                     # COCO val2017, final evaluation  (100 images, per specification §4.1/4.2)
 
-captions_per_image: 5           # on garde les 5 premières (par caption_id) si l'image en a plus
+captions_per_image: 5           # keep the first 5 (by caption_id) if the image has more
 
 sampling:
-  min_objects: 1                # images sans aucune annotation exclues (pas de métadonnées possibles)
+  min_objects: 1                # images with no annotation are excluded (no metadata possible)
   min_side_px: 200
-  kb_min_images_per_category: 60   # plancher de couverture des 80 classes dans la KB
-  # distribution cible (stratifiée) pour val et test : scènes simples -> chargées
+  kb_min_images_per_category: 60   # coverage floor for the 80 classes in the KB
+  # target (stratified) distribution for val and test: simple scenes -> crowded
   eval_complexity_target: {simple: 0.25, medium: 0.30, complex: 0.30, crowded: 0.15}
-  eval_min_interaction_frac: 0.30  # >= 30% d'images avec interaction (personne+objet, animal+objet...)
+  eval_min_interaction_frac: 0.30  # >= 30% of images with an interaction (person+object, animal+object...)
   eval_min_context_frac: 0.20      # chaque contexte (indoor/outdoor) >= 20% si possible
 
 image:
-  max_side: 512                 # copie RGB normalisée (ratio conservé), l'encodeur fait son propre resize
+  max_side: 512                 # normalized RGB copy (aspect ratio kept), the encoder does its own resize
   jpeg_quality: 95
   dhash_size: 8
   near_dup_hamming: 4           # seuil near-duplicate (dHash 64 bits)
-  night_brightness_thr: 0.28    # luminosité moyenne [0-1] sous laquelle on dit "night/dark"
+  night_brightness_thr: 0.28    # mean brightness [0-1] below which an image is labelled "night/dark"
 
-detector:                       # optionnel (03b) : métadonnées SANS annotations GT pour les requêtes
+detector:                       # optional (03b): query metadata WITHOUT GT annotations
   model: facebook/detr-resnet-50
   conf_threshold: 0.7
 
@@ -41,8 +41,8 @@ primary_encoder: siglip-b16
 sbert_model: sentence-transformers/all-MiniLM-L6-v2
 
 index:
-  type: flat_ip                 # exact, cosinus (vecteurs L2-normalisés + produit scalaire)
-  hnsw: {M: 32, efConstruction: 200, efSearch: 64}   # indexé aussi pour documentation/latence
+  type: flat_ip                 # exact, cosine (L2-normalized vectors + inner product)
+  hnsw: {M: 32, efConstruction: 200, efSearch: 64}   # also indexed for documentation/latency
 
 tuning:
   top_k: [1, 3, 5, 10]
